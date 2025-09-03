@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, ChevronDown } from 'lucide-react';
 
-const AddLead = ({ isOpen, onClose }) => {
+const AddLead = ({ isOpen, onClose, onLeadCreated }) => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -20,18 +20,67 @@ const AddLead = ({ isOpen, onClose }) => {
     heardFrom: ''
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = () => {
-    // Handle form submission here
-    console.log('Form data:', formData);
-    onClose();
+  const handleSubmit = async () => {
+    if (!formData.name || !formData.email || !formData.phone) {
+      alert('Please fill in required fields: Name, Email, and Phone');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      console.log('Sending form data:', formData);
+      
+      const response = await fetch('http://localhost:3000/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+      
+      console.log('Response status:', response.status);
+      console.log('Response data:', result);
+
+      if (result.success) {
+        const newLead = {
+          name: result.data.name,
+          contact: result.data.phone,
+          status: result.data.status,
+          qualification: result.data.qualification,
+          interest: result.data.interestField,
+          source: result.data.source,
+          assignedTo: result.data.assignedTo,
+          updatedDate: new Date().toLocaleDateString(),
+          updatedTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        if (onLeadCreated) {
+          onLeadCreated(newLead);
+        }
+
+        alert('Lead created successfully!');
+        handleCancel();
+      } else {
+        alert(result.message || 'Error creating lead');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Error creating lead. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
-    // Reset form and close modal
     setFormData({
       name: '',
       phone: '',
@@ -302,9 +351,14 @@ const AddLead = ({ isOpen, onClose }) => {
           </button>
           <button
             onClick={handleSubmit}
-            className="px-4 py-1 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSubmitting}
+            className={`px-4 py-1 text-sm font-medium text-white border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              isSubmitting 
+                ? 'bg-blue-400 cursor-not-allowed' 
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
           >
-            Add Lead
+            {isSubmitting ? 'Adding...' : 'Add Lead'}
           </button>
         </div>
       </div>

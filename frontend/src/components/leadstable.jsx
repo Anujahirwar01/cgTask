@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowUpDown, ChevronDown } from 'lucide-react';
 
-const LeadsTable = () => {
+const LeadsTable = ({ leads = [] }) => {
   const tableHeaders = [
     { label: 'Name', key: 'name' },
     { label: 'Contact', key: 'contact' },
@@ -13,8 +13,6 @@ const LeadsTable = () => {
     { label: 'Updated At', key: 'updatedAt' },
     { label: '', key: 'actions' }
   ];
-
-  const leads = [];
 
   const getStatusBadge = (status) => {
     const statusStyles = {

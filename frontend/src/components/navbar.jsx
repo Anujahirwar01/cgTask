@@ -24,7 +24,7 @@ const Navbar = () => {
   ];
 
   return (
-    <div className="w-64 h-screen bg-white border-r border-gray-200 flex flex-col">
+    <div className="w-64 h-screen  bg-white border-r border-gray-200 flex flex-col">
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <h1 className="text-xl font-semibold text-gray-900">LeadCRM</h1>
         <button className="p-1 hover:bg-gray-200 rounded">
